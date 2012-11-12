@@ -1,4 +1,4 @@
-package info.acidflow.tamagochi.opener;
+package info.acidflow.tamadroid.opener;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -1,4 +1,4 @@
-package info.acidflow.tamagochi.model;
+package info.acidflow.tamadroid.model;
 
 import org.andengine.entity.sprite.AnimatedSprite;
 import org.andengine.opengl.texture.region.ITiledTextureRegion;

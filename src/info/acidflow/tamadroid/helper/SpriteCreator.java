@@ -1,7 +1,7 @@
 /**
  * 
  */
-package info.acidflow.tamagochi.helper;
+package info.acidflow.tamadroid.helper;
 
 import org.andengine.opengl.texture.TextureManager;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;

@@ -1,4 +1,4 @@
-package info.acidflow.tamagochi;
+package info.acidflow.tamadroid;
 
 import org.andengine.engine.options.EngineOptions;
 import org.andengine.entity.scene.Scene;
