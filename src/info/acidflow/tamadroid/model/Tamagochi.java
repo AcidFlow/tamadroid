@@ -1,5 +1,12 @@
 package info.acidflow.tamadroid.model;
 
+
+
+import info.acidflow.tamadroid.annotation.MaxValue;
+import info.acidflow.tamadroid.model.food.Food;
+
+import java.lang.reflect.Field;
+
 import org.andengine.entity.sprite.AnimatedSprite;
 import org.andengine.opengl.texture.region.ITiledTextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
@@ -10,11 +17,17 @@ public abstract class Tamagochi extends AnimatedSprite {
 	
 	private double _age;
 	private double _weight;
+	@MaxValue(max=1)
 	private double _hunger;
+	@MaxValue(max=1)
 	private double _thirst;
+	@MaxValue(max=1)
 	private double _energy;
+	@MaxValue(max=1)
 	private double _cleanliness;
+	@MaxValue(max=1)
 	private double _health;
+	@MaxValue(max=1)
 	private double _morale;
 	
 	protected Tamagochi(float pX, float pY,
@@ -23,12 +36,12 @@ public abstract class Tamagochi extends AnimatedSprite {
 		super(pX, pY, pTiledTextureRegion, pVertexBufferObjectManager);
 		_age = 0;
 		_weight = Math.random() + MIN_WEIGHT;
-		_hunger = 100;
-		_thirst = 100;
-		_energy = 100;
-		_cleanliness = 100;
-		_health = 100;
-		_morale = 100;
+		_hunger = 1;
+		_thirst = 1;
+		_energy = 1;
+		_cleanliness = 1;
+		_health = 1;
+		_morale = 1;
 	}
 	
 	public double getAge() {
@@ -93,6 +106,32 @@ public abstract class Tamagochi extends AnimatedSprite {
 
 	public void setMorale(double _morale) {
 		this._morale = _morale;
+	}
+	
+	public void eat(Food f){
+		_hunger += f.getReduceHungerFactor();
+		_weight += f.getIncreaseWeightFactor();
+		cutAtMaximumValues();
+		//TODO gout etc...
+	}
+	
+	/**
+	 * Set any attribute to its maximum value if annotated 
+	 */
+	private void cutAtMaximumValues(){
+		for(Field f : getClass().getDeclaredFields()){
+			if(f.isAnnotationPresent(MaxValue.class)){
+				try {
+					if(f.getDouble(this) > f.getAnnotation(MaxValue.class).max()){
+						f.setDouble(this, f.getAnnotation(MaxValue.class).max());
+					}
+				} catch (IllegalArgumentException e) {
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
 }
