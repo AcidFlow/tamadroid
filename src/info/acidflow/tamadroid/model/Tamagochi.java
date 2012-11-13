@@ -2,7 +2,7 @@ package info.acidflow.tamadroid.model;
 
 
 
-import info.acidflow.tamadroid.annotation.MaxValue;
+import info.acidflow.tamadroid.annotation.MaxDoubleValue;
 import info.acidflow.tamadroid.model.food.Food;
 
 import java.lang.reflect.Field;
@@ -17,17 +17,17 @@ public abstract class Tamagochi extends AnimatedSprite {
 	
 	private double _age;
 	private double _weight;
-	@MaxValue(max=1)
+	@MaxDoubleValue(max=1)
 	private double _hunger;
-	@MaxValue(max=1)
+	@MaxDoubleValue(max=1)
 	private double _thirst;
-	@MaxValue(max=1)
+	@MaxDoubleValue(max=1)
 	private double _energy;
-	@MaxValue(max=1)
+	@MaxDoubleValue(max=1)
 	private double _cleanliness;
-	@MaxValue(max=1)
+	@MaxDoubleValue(max=1)
 	private double _health;
-	@MaxValue(max=1)
+	@MaxDoubleValue(max=1)
 	private double _morale;
 	
 	protected Tamagochi(float pX, float pY,
@@ -120,10 +120,10 @@ public abstract class Tamagochi extends AnimatedSprite {
 	 */
 	private void cutAtMaximumValues(){
 		for(Field f : getClass().getDeclaredFields()){
-			if(f.isAnnotationPresent(MaxValue.class)){
+			if(f.isAnnotationPresent(MaxDoubleValue.class)){
 				try {
-					if(f.getDouble(this) > f.getAnnotation(MaxValue.class).max()){
-						f.setDouble(this, f.getAnnotation(MaxValue.class).max());
+					if(f.getDouble(this) > f.getAnnotation(MaxDoubleValue.class).max()){
+						f.setDouble(this, f.getAnnotation(MaxDoubleValue.class).max());
 					}
 				} catch (IllegalArgumentException e) {
 					e.printStackTrace();
