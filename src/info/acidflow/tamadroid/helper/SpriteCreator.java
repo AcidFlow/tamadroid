@@ -16,22 +16,20 @@ import android.content.Context;
  */
 public final class SpriteCreator {
 	
-	private BitmapTextureAtlas _texture;
-	private TiledTextureRegion _tiledTexture;
+	private static BitmapTextureAtlas _texture;
+	private static TiledTextureRegion _tiledTexture;
 	
-	public BitmapTextureAtlas getTexture() {
+	private SpriteCreator(){}
+	
+	public static BitmapTextureAtlas getTexture() {
 		return _texture;
 	}
 
-	public TiledTextureRegion getTiledTexture() {
+	public static TiledTextureRegion getTiledTexture() {
 		return _tiledTexture;
 	}
 
-	public SpriteCreator(){
-		
-	}
-	
-	public void createTiledTextureRegionForAnimatedSprite(String file, TextureManager tm, int pow2width, int pow2height, Context c, int pX, int pY, int col, int row){
+	public static void createTiledTextureRegionForAnimatedSprite(String file, TextureManager tm, int pow2width, int pow2height, Context c, int pX, int pY, int col, int row){
 		_texture = new BitmapTextureAtlas(tm ,pow2width, pow2height);
 		_tiledTexture = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(_texture, c, file, pX,pY,col,row);
 	}
