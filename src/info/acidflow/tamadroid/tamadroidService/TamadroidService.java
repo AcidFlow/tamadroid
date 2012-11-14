@@ -20,6 +20,7 @@ public class TamadroidService extends Service {
 	public static final int MSG_HEAL_PET = 3;
 	public static final int MSG_PLAY_WITH_PET = 4;
 	public static final int MSG_SWITCH_LIGHT = 5;
+	public static final int MSG_EGG_BROKEN = 6;
 
 	/**
 	 * Argument type constant for data transmission through messages 
@@ -30,34 +31,34 @@ public class TamadroidService extends Service {
 	public static final String SWITCH_STATE = "switchState";
 	
 	
-	private Messenger _client; 
-	private final Messenger _messenger = new Messenger(new IncomingMessageHandler(this)); 
+	private Messenger _activityMessenger; 
+	private final Messenger _serviceMessenger = new Messenger(new ServiceIncomingMessageHandler(this)); 
 
 
 	@Override
 	public IBinder onBind(Intent arg0) {
-		return _messenger.getBinder();
+		return _serviceMessenger.getBinder();
 	}
 
 	@Override
 	public void onCreate() {
-		Toast.makeText(getApplicationContext(), "Creating service", Toast.LENGTH_LONG);
+		Toast.makeText(getApplicationContext(), "Creating service", Toast.LENGTH_LONG).show();
 		super.onCreate();
 	}
 
 	@Override
 	public void onDestroy() {
-		Toast.makeText(getApplicationContext(), "Destroying service", Toast.LENGTH_LONG);
+		Toast.makeText(getApplicationContext(), "Destroying service", Toast.LENGTH_LONG).show();
 		super.onDestroy();
 	}
 
 	public void registerClient(Messenger replyTo) {
-		_client = replyTo;
+		_activityMessenger = replyTo;
 		Log.i(LOG_TAG, "Registering client");
 	}
 	
 	public void unregisterClient() {
-		_client = null;
+		_activityMessenger = null;
 		Log.i(LOG_TAG, "Unregistering client");
 	}
 	

@@ -15,11 +15,11 @@ import android.os.Message;
  * appropriate method on the service with the datas found in the message if available
  *
  */
-public class IncomingMessageHandler extends Handler {
+public class ServiceIncomingMessageHandler extends Handler {
 
 	private TamadroidService _service; 
 	
-	public IncomingMessageHandler(TamadroidService service) {
+	public ServiceIncomingMessageHandler(TamadroidService service) {
 		super();
 		_service = service;
 	}
