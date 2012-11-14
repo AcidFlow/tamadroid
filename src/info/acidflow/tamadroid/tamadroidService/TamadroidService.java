@@ -42,12 +42,14 @@ public class TamadroidService extends Service {
 
 	@Override
 	public void onCreate() {
+		Log.i(LOG_TAG, "Creating service");
 		Toast.makeText(getApplicationContext(), "Creating service", Toast.LENGTH_LONG).show();
 		super.onCreate();
 	}
 
 	@Override
 	public void onDestroy() {
+		Log.i(LOG_TAG, "Destroying service");
 		Toast.makeText(getApplicationContext(), "Destroying service", Toast.LENGTH_LONG).show();
 		super.onDestroy();
 	}

@@ -16,11 +16,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
-        <service 
-            android:name=".tamadroidService">
-            
-        </service>
+
+        <service
+            android:name=".tamadroidService.TamadroidService"
+            android:enabled="true" />
     </application>
 
 </manifest>
