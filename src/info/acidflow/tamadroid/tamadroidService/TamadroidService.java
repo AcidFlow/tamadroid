@@ -1,9 +1,17 @@
 package info.acidflow.tamadroid.tamadroidService;
 
+import info.acidflow.tamadroid.config.EggConfig;
+import info.acidflow.tamadroid.database.DatabaseInterface;
+import info.acidflow.tamadroid.egg.EggUpdater;
+
+import java.util.Timer;
+
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.os.Message;
 import android.os.Messenger;
+import android.os.RemoteException;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -21,7 +29,9 @@ public class TamadroidService extends Service {
 	public static final int MSG_PLAY_WITH_PET = 4;
 	public static final int MSG_SWITCH_LIGHT = 5;
 	public static final int MSG_EGG_BROKEN = 6;
-
+	public static final int MSG_EGG_STARTED = 7;
+	public static final int MSG_RADIATOR_SET = 8;
+	
 	/**
 	 * Argument type constant for data transmission through messages 
 	 */
@@ -31,10 +41,24 @@ public class TamadroidService extends Service {
 	public static final String SWITCH_STATE = "switchState";
 	
 	
+	/** 
+	 * Messengers for communication with the activity
+	 */
 	private Messenger _activityMessenger; 
 	private final Messenger _serviceMessenger = new Messenger(new ServiceIncomingMessageHandler(this)); 
 
-
+	/**
+	 * Database interface for communication with the DB
+	 */
+	DatabaseInterface _db;
+	
+	/**
+	 * Timers for regular updates
+	 *
+	 */
+	Timer _eggTimer;
+	
+	
 	@Override
 	public IBinder onBind(Intent arg0) {
 		return _serviceMessenger.getBinder();
@@ -44,6 +68,7 @@ public class TamadroidService extends Service {
 	public void onCreate() {
 		Log.i(LOG_TAG, "Creating service");
 		Toast.makeText(getApplicationContext(), "Creating service", Toast.LENGTH_LONG).show();
+		//_db = new ???? @TODO 
 		super.onCreate();
 	}
 
@@ -78,5 +103,41 @@ public class TamadroidService extends Service {
 	
 	public void switchLight(boolean state) {
 		Log.i(LOG_TAG, "Switching light, light is now : " + state);
+	}
+
+	public void startEggTimer() {
+		_eggTimer = new Timer();
+		_eggTimer.schedule(new EggUpdater(this), 0, 30000);
+		Log.i(LOG_TAG, "Egg timer started");
+	}
+	
+	public void setRadiator() {
+		_db.setRadiatorState(true);
+	}
+
+	public void updateEgg() {
+		// If the egg is being heated up, update breed timer
+		if (_db.getRadiatorState()) {
+			_db.updateEggTime(_db.getEggTime() + 1.0);
+		}
+		// If the egg has reached the require breed time, open it
+		if (_db.getEggTime() >= EggConfig.EGG_REQUIRED_BREED_TIME) {
+			_db.setEggOpen();
+			// Notify the activity that the egg state has changed
+			Message msg = Message.obtain(null, MSG_EGG_BROKEN);
+			sendMessage(msg);
+		}
+	}
+	
+	private boolean sendMessage(Message msg) {
+		if (_activityMessenger != null) {
+			try {
+				_activityMessenger.send(msg);
+				return true;
+			} catch (RemoteException e) {
+				return false;
+			}
+		}
+		return false;
 	}
 }

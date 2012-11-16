@@ -49,6 +49,12 @@ public class ServiceIncomingMessageHandler extends Handler {
 			_service.switchLight(msg.getData().getBoolean(TamadroidService.SWITCH_STATE));
 		}
 		break;
+		case TamadroidService.MSG_EGG_STARTED: {
+			_service.startEggTimer();
+		}
+		case TamadroidService.MSG_RADIATOR_SET: {
+			_service.setRadiator();
+		}
 		default: super.handleMessage(msg);
 		}
 	}
