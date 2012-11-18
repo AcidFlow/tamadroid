@@ -129,7 +129,7 @@ public class PlayActivity extends SimpleBaseGameActivity{
 	@Override
 	protected Scene onCreateScene() {
 		_menuThermometerScene = _menuThermometer.createMenuScene(_camera);
-		_menuThermometer.getMenuItem(MenuElement.THERMOMETER_ON).setMenuCallback(new SwitchHeatingOnCallback(_serviceMessenger));
+		_menuThermometer.getMenuItem(MenuElement.THERMOMETER_ON).setMenuCallback(new SwitchHeatingOnCallback(_serviceMessenger,  _menuThermometerScene));
 		_mainScene = new Scene();
 		_mainScene.setBackground(new Background(Color.GREEN));
 		Heating thermometer = new Heating(10, 400, _thermometerTexture, getVertexBufferObjectManager());
