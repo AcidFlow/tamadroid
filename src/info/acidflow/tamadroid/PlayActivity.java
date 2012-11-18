@@ -3,12 +3,16 @@ package info.acidflow.tamadroid;
 import info.acidflow.tamadroid.helper.SpriteCreator;
 import info.acidflow.tamadroid.menu.Menu;
 import info.acidflow.tamadroid.menu.MenuElement;
-import info.acidflow.tamadroid.menu.callback.QuitMenuCallback;
-import info.acidflow.tamadroid.menu.callback.ResetMenuCallback;
+import info.acidflow.tamadroid.menu.callback.DisplayMenuCallback;
+import info.acidflow.tamadroid.menu.callback.SwitchHeatingOnCallback;
+import info.acidflow.tamadroid.model.Heating;
 import info.acidflow.tamadroid.model.SimpleTamagochi;
 import info.acidflow.tamadroid.model.Tamagochi;
+import info.acidflow.tamadroid.opener.InputStreamAssetOpener;
 import info.acidflow.tamadroid.tamadroidService.ActivityIncomingMessageHandler;
 import info.acidflow.tamadroid.tamadroidService.TamadroidService;
+
+import java.io.IOException;
 
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.options.EngineOptions;
@@ -17,7 +21,11 @@ import org.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.scene.menu.MenuScene;
+import org.andengine.opengl.texture.ITexture;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
+import org.andengine.opengl.texture.bitmap.BitmapTexture;
+import org.andengine.opengl.texture.region.ITextureRegion;
+import org.andengine.opengl.texture.region.TextureRegionFactory;
 import org.andengine.opengl.texture.region.TiledTextureRegion;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
 import org.andengine.util.color.Color;
@@ -47,8 +55,9 @@ public class PlayActivity extends SimpleBaseGameActivity{
 	 */
 	private Camera _camera;
 	private Scene _mainScene;
-	private MenuScene _menuScene;
-	private Menu _menu;
+	private MenuScene _menuThermometerScene;
+	private Menu _menuThermometer;
+	private ITextureRegion _thermometerTexture;
 	private TiledTextureRegion _tamagochiTiledTextureRegion;
 
 	/**
@@ -100,23 +109,33 @@ public class PlayActivity extends SimpleBaseGameActivity{
 
 	@Override
 	protected void onCreateResources() {
-		BitmapTextureAtlas menuTexture = new BitmapTextureAtlas(getTextureManager(), 256, 128);
-		_menu = new Menu(menuTexture, getVertexBufferObjectManager(), getAssets());
-		_menu.addItem(MenuElement.RESET, "gfx/menu_reset.png", 0, 0);
-		_menu.addItem(MenuElement.QUIT, "gfx/menu_quit.png", 0, 50);
-		_menu.load();
-		SpriteCreator.createTiledTextureRegionForAnimatedSprite("gfx/sprite_egg.png", getTextureManager(), this, 2, 2);
-		SpriteCreator.getTexture().load();
-		_tamagochiTiledTextureRegion = SpriteCreator.getTiledTexture();
+		try {
+			BitmapTextureAtlas menuTexture = new BitmapTextureAtlas(getTextureManager(), 256, 256);
+			_menuThermometer = new Menu(menuTexture, getVertexBufferObjectManager(), getAssets());
+			_menuThermometer.addItem(MenuElement.THERMOMETER_ON, "gfx/btn_on.png", 0, 0);
+			_menuThermometer.load();
+
+			ITexture thermometerTexture = new BitmapTexture(getTextureManager(), new InputStreamAssetOpener(getAssets(), "gfx/thermometer.png"));
+			thermometerTexture.load();
+			_thermometerTexture = TextureRegionFactory.extractFromTexture(thermometerTexture);
+			SpriteCreator.createTiledTextureRegionForAnimatedSprite("gfx/sprite_egg.png", getTextureManager(), this, 2, 2);
+			SpriteCreator.getTexture().load();
+			_tamagochiTiledTextureRegion = SpriteCreator.getTiledTexture();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
 	protected Scene onCreateScene() {
-		_menuScene = _menu.createMenuScene(_camera);
+		_menuThermometerScene = _menuThermometer.createMenuScene(_camera);
+		_menuThermometer.getMenuItem(MenuElement.THERMOMETER_ON).setMenuCallback(new SwitchHeatingOnCallback(_serviceMessenger));
 		_mainScene = new Scene();
-		_menu.getMenuItem(MenuElement.RESET).setMenuCallback(new ResetMenuCallback(_mainScene, _menuScene));
-		_menu.getMenuItem(MenuElement.QUIT).setMenuCallback(new QuitMenuCallback(this));
 		_mainScene.setBackground(new Background(Color.GREEN));
+		Heating thermometer = new Heating(10, 400, _thermometerTexture, getVertexBufferObjectManager());
+		thermometer.setCallback(new DisplayMenuCallback(_mainScene, _menuThermometerScene));
+		_mainScene.registerTouchArea(thermometer);
+		_mainScene.attachChild(thermometer);
 		Tamagochi tamagochi = new SimpleTamagochi((CAMERA_WIDTH - 128)/2, (CAMERA_HEIGHT - 128)/2, _tamagochiTiledTextureRegion, getVertexBufferObjectManager());
 		tamagochi.animate(250);
 		_mainScene.attachChild(tamagochi);
@@ -138,16 +157,16 @@ public class PlayActivity extends SimpleBaseGameActivity{
 			}
 		}
 	}
-	
+
 	@Override
 	public boolean onKeyDown(final int pKeyCode, final KeyEvent pEvent) {
-		if(pKeyCode == KeyEvent.KEYCODE_MENU && pEvent.getAction() == KeyEvent.ACTION_DOWN) {
+		if(pKeyCode == KeyEvent.KEYCODE_BACK && pEvent.getAction() == KeyEvent.ACTION_DOWN) {
 			if(_mainScene.hasChildScene()) {
 				/* Remove the menu and reset it. */
-				_menuScene.back();
+				_menuThermometerScene.back();
 			} else {
 				/* Attach the menu. */
-				_mainScene.setChildScene(_menuScene, false, true, true);
+				finish();
 			}
 			return true;
 		} else {
