@@ -83,7 +83,7 @@ public class PlayActivity extends SimpleBaseGameActivity{
 				// Send a message for registration
 				Message msg = Message.obtain(null, TamadroidService.MSG_REGISTER_CLIENT);
 				msg.replyTo = _activityMessenger;
-				_serviceMessenger.send(msg);
+				_serviceMessenger.send(msg);				
 			} catch (RemoteException e) {}
 		}
 	};
