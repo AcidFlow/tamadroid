@@ -21,7 +21,7 @@ public class Database implements DatabaseInterface {
 	private final Context context; 
 	private DatabaseHelper DBHelper;
 	private SQLiteDatabase db;
-	private static final String DATABASE_NAME = "tamadroid";
+	private static final String DATABASE_NAME = "tamadroid.db";
 	private static final int DATABASE_VERSION = 1;
 	private static final String DATABASE_CREATE = "sql/create_db.sql";
 	private static final String TAG = "DB";
@@ -29,6 +29,7 @@ public class Database implements DatabaseInterface {
 	private static final String COLUMN_EGG_TIME = "time";
 	private static final String COLUMN_EGG_RAD = "rad";
 	private static final String COLUMN_EGG_OPEN = "open";
+	private static final String[] ALL_COLUMNS = {COLUMN_EGG_OPEN, COLUMN_EGG_RAD, COLUMN_EGG_TIME};
 
 
 	public Database(Context ctx) 
@@ -87,8 +88,9 @@ public class Database implements DatabaseInterface {
 	public double getEggTime() {
 		// TODO Auto-generated method stub
 		Cursor query = db.query(TABLE_EGG, 
-								new String[] {COLUMN_EGG_TIME},
-								null, null, null, null, null);
+				new String[] {COLUMN_EGG_TIME},
+				null, null, null, null, null);
+		query.moveToFirst();
 		int index = query.getColumnIndex(COLUMN_EGG_TIME);
 		double time = query.getDouble(index);
 		query.close();
@@ -108,8 +110,9 @@ public class Database implements DatabaseInterface {
 	public boolean getRadiatorState() {
 		// TODO Auto-generated method stub
 		Cursor query = db.query(TABLE_EGG, 
-								new String[] {COLUMN_EGG_RAD},
-								null, null, null, null, null);
+				new String[] {COLUMN_EGG_RAD},
+				null, null, null, null, null);
+		query.moveToFirst();
 		int index = query.getColumnIndex(COLUMN_EGG_RAD);
 		int state = query.getInt(index);
 		query.close();
@@ -121,7 +124,7 @@ public class Database implements DatabaseInterface {
 	public void setRadiatorState(boolean state) {
 		// TODO Auto-generated method stub
 		ContentValues args = new ContentValues();
-		args.put(COLUMN_EGG_RAD, state ? 0 : 1);
+		args.put(COLUMN_EGG_RAD, state ? 1 : 0);
 		int ret = db.update(TABLE_EGG, args, null, null);
 		Log.i(TAG,"Up Radiator with value " + state + ", " + ret + " rows affected.");
 	}
@@ -130,8 +133,9 @@ public class Database implements DatabaseInterface {
 	public boolean isEggOpen() {
 		// TODO Auto-generated method stub
 		Cursor query = db.query(TABLE_EGG, 
-								new String[] {COLUMN_EGG_OPEN},
-								null, null, null, null, null);
+				new String[] {COLUMN_EGG_OPEN},
+				null, null, null, null, null);
+		query.moveToFirst();
 		int index = query.getColumnIndex(COLUMN_EGG_OPEN);
 		int state = query.getInt(index);
 		query.close();
@@ -147,5 +151,22 @@ public class Database implements DatabaseInterface {
 		int ret = db.update(TABLE_EGG, args, null, null);
 		Log.i(TAG,"Set Egg open, " + ret + " rows affected.");
 	}
+
+	public void initEggTable(){
+		ContentValues values = new ContentValues();
+		values.put(COLUMN_EGG_OPEN, false);
+		values.put(COLUMN_EGG_RAD, false);
+		values.put(COLUMN_EGG_TIME, 0);
+		long ret = db.insert(TABLE_EGG, null, values);
+		Log.i(TAG, ret + " row inserted");
+	}
 	
+	public boolean isDatabaseInitialized(){
+		boolean ret;
+		Cursor c = db.query(TABLE_EGG, ALL_COLUMNS, null, null, null, null, null);
+		ret = c.moveToFirst();
+		c.close();
+		return ret;
+	}
+
 }

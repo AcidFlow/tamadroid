@@ -19,7 +19,7 @@ import android.widget.Toast;
 public class TamadroidService extends Service {
 
 	private static final String LOG_TAG = "TamadroidService";
-	
+
 	/**
 	 * Message type constants for dialog between the service and the activity
 	 */
@@ -32,7 +32,7 @@ public class TamadroidService extends Service {
 	public static final int MSG_EGG_BROKEN = 6;
 	public static final int MSG_EGG_STARTED = 7;
 	public static final int MSG_RADIATOR_SET = 8;
-	
+
 	/**
 	 * Argument type constant for data transmission through messages 
 	 */
@@ -40,8 +40,8 @@ public class TamadroidService extends Service {
 	public static final String HEAL_AMOUNT = "healAmount";
 	public static final String PLAY_AMOUNT = "playAmount";
 	public static final String SWITCH_STATE = "switchState";
-	
-	
+
+
 	/** 
 	 * Messengers for communication with the activity
 	 */
@@ -52,15 +52,17 @@ public class TamadroidService extends Service {
 	 * Database interface for communication with the DB
 	 */
 	Database _db;
-	
+
 	/**
 	 * Timers for regular updates
 	 *
 	 */
 	Timer _eggTimer;
 	Timer _petTimer;
-	
-	
+	private static final int SECONDS = 1000;
+	private static final long UPDATE_TIME_EGG = 30 * SECONDS; 
+	private static final long UPDATE_TIME_PET = 60 * SECONDS;
+
 	@Override
 	public IBinder onBind(Intent arg0) {
 		return _serviceMessenger.getBinder();
@@ -73,6 +75,9 @@ public class TamadroidService extends Service {
 		//_db = new ???? @TODO 
 		_db = new Database(getApplicationContext());
 		_db.open();
+		if(!_db.isDatabaseInitialized())
+			_db.initEggTable();
+		startEggTimer();
 		super.onCreate();
 	}
 
@@ -88,40 +93,40 @@ public class TamadroidService extends Service {
 		_activityMessenger = replyTo;
 		Log.i(LOG_TAG, "Registering client");
 	}
-	
+
 	public void unregisterClient() {
 		_activityMessenger = null;
 		Log.i(LOG_TAG, "Unregistering client");
 	}
-	
+
 	public void feedPet(double amount) {
 		Log.i(LOG_TAG, "Feeding pet : " + amount);
 	}
-	
+
 	public void healPet(double amount) {
 		Log.i(LOG_TAG, "Healing pet : " + amount);
 	}
-	
+
 	public void playWithPet(double amount) {
 		Log.i(LOG_TAG, "Playing with pet : " + amount);
 	}
-	
+
 	public void switchLight(boolean state) {
 		Log.i(LOG_TAG, "Switching light, light is now : " + state);
 	}
 
 	public void startEggTimer() {
 		_eggTimer = new Timer();
-		_eggTimer.schedule(new EggUpdater(this), 0, 30000);
+		_eggTimer.schedule(new EggUpdater(this), 0, UPDATE_TIME_EGG);
 		Log.i(LOG_TAG, "Egg timer started");
 	}
-	
+
 	public void startPetTimer() {
 		_petTimer = new Timer();
-		_petTimer.schedule(new PetUpdater(this), 0, 60000);
+		_petTimer.schedule(new PetUpdater(this), 0, UPDATE_TIME_PET);
 		Log.i(LOG_TAG, "Pet timer started");
 	}
-	
+
 	public void setRadiator() {
 		_db.setRadiatorState(true);
 	}
@@ -139,13 +144,13 @@ public class TamadroidService extends Service {
 			sendMessage(msg);
 		}
 	}
-	
+
 	public void updatePet() {
 		// increment timer
 		// increment score
 		// check for evolution
 	}
-	
+
 	private boolean sendMessage(Message msg) {
 		if (_activityMessenger != null) {
 			try {
