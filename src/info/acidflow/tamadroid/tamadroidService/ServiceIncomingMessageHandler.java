@@ -52,9 +52,11 @@ public class ServiceIncomingMessageHandler extends Handler {
 		case TamadroidService.MSG_EGG_STARTED: {
 			_service.startEggTimer();
 		}
+		break;
 		case TamadroidService.MSG_RADIATOR_SET: {
 			_service.setRadiator();
 		}
+		break;
 		default: super.handleMessage(msg);
 		}
 	}

@@ -83,7 +83,7 @@ public class PlayActivity extends SimpleBaseGameActivity{
 				// Send a message for registration
 				Message msg = Message.obtain(null, TamadroidService.MSG_REGISTER_CLIENT);
 				msg.replyTo = _activityMessenger;
-				_serviceMessenger.send(msg);
+				_serviceMessenger.send(msg);				
 			} catch (RemoteException e) {}
 		}
 	};
@@ -129,7 +129,7 @@ public class PlayActivity extends SimpleBaseGameActivity{
 	@Override
 	protected Scene onCreateScene() {
 		_menuThermometerScene = _menuThermometer.createMenuScene(_camera);
-		_menuThermometer.getMenuItem(MenuElement.THERMOMETER_ON).setMenuCallback(new SwitchHeatingOnCallback(_serviceMessenger));
+		_menuThermometer.getMenuItem(MenuElement.THERMOMETER_ON).setMenuCallback(new SwitchHeatingOnCallback(_serviceMessenger,  _menuThermometerScene));
 		_mainScene = new Scene();
 		_mainScene.setBackground(new Background(Color.GREEN));
 		Heating thermometer = new Heating(10, 400, _thermometerTexture, getVertexBufferObjectManager());

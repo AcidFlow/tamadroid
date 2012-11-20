@@ -58,6 +58,7 @@ public class TamadroidService extends Service {
 	 *
 	 */
 	Timer _eggTimer;
+	Timer _petTimer;
 	
 	
 	@Override
@@ -115,6 +116,12 @@ public class TamadroidService extends Service {
 		Log.i(LOG_TAG, "Egg timer started");
 	}
 	
+	public void startPetTimer() {
+		_petTimer = new Timer();
+		_petTimer.schedule(new PetUpdater(this), 0, 60000);
+		Log.i(LOG_TAG, "Pet timer started");
+	}
+	
 	public void setRadiator() {
 		_db.setRadiatorState(true);
 	}
@@ -131,6 +138,12 @@ public class TamadroidService extends Service {
 			Message msg = Message.obtain(null, MSG_EGG_BROKEN);
 			sendMessage(msg);
 		}
+	}
+	
+	public void updatePet() {
+		// increment timer
+		// increment score
+		// check for evolution
 	}
 	
 	private boolean sendMessage(Message msg) {

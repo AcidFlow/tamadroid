@@ -16,7 +16,6 @@ public class EggUpdater extends TimerTask {
 	
 	@Override
 	public void run() {
-		_service.updateEgg();
 		Log.i("EggUpdater", "Egg updated");
 	}
 
