@@ -1,7 +1,7 @@
 package info.acidflow.tamadroid.database;
 
 public interface DatabaseInterface {
-
+	
 	public double getEggTime();
 	public void updateEggTime(double time);
 	public boolean getRadiatorState();

@@ -1,6 +1,7 @@
 package info.acidflow.tamadroid.tamadroidService;
 
 import info.acidflow.tamadroid.config.EggConfig;
+import info.acidflow.tamadroid.database.Database;
 import info.acidflow.tamadroid.database.DatabaseInterface;
 import info.acidflow.tamadroid.egg.EggUpdater;
 
@@ -50,7 +51,7 @@ public class TamadroidService extends Service {
 	/**
 	 * Database interface for communication with the DB
 	 */
-	DatabaseInterface _db;
+	Database _db;
 	
 	/**
 	 * Timers for regular updates
@@ -69,6 +70,8 @@ public class TamadroidService extends Service {
 		Log.i(LOG_TAG, "Creating service");
 		Toast.makeText(getApplicationContext(), "Creating service", Toast.LENGTH_LONG).show();
 		//_db = new ???? @TODO 
+		_db = new Database(getApplicationContext());
+		_db.open();
 		super.onCreate();
 	}
 
@@ -76,6 +79,7 @@ public class TamadroidService extends Service {
 	public void onDestroy() {
 		Log.i(LOG_TAG, "Destroying service");
 		Toast.makeText(getApplicationContext(), "Destroying service", Toast.LENGTH_LONG).show();
+		_db.close();
 		super.onDestroy();
 	}
 
